@@ -9,9 +9,14 @@ sleeping: .res 1
 buttons_held: .res 1
 buttons_pressed: .res 1
 
-xhigh: .res 1
-xlow: .res 1
-speed: .res 1
+x_pos_hi: .res 1
+x_pos_lo: .res 1
+y_pos_hi: .res 1
+y_pos_lo: .res 1
+x_speed_hi: .res 1
+x_speed_lo: .res 1
+y_speed_hi: .res 1
+y_speed_lo: .res 1
 
 .segment "CODE"
 
@@ -30,13 +35,19 @@ speed: .res 1
 
   jsr read_controller
 
-  ;This is the PPU clean up section, so rendering the next frame starts properly.
-  lda #%10010000   ; enable NMI, sprites from Pattern Table 0, background from Pattern Table 1
+; --------------------------------------------------
+; This is the PPU clean up section, so rendering the next frame starts properly.
+; enable NMI, sprites from Pattern Table 0, background from Pattern Table 1
+; enable sprites, enable background, no clipping on left side
+; --------------------------------------------------
+  lda #%10010000
   sta PPUCTRL
-  lda #%00011110   ; enable sprites, enable background, no clipping on left side
+  lda #%00011110
   sta PPUMASK
 
-  ;;
+; --------------------------------------------------
+; loop
+; --------------------------------------------------
   lda #$00
   sta sleeping
 
@@ -86,7 +97,6 @@ load_palettes:
   sta PPUCTRL
   lda #%00011110  ; turn on screen
   sta PPUMASK
-  ;;
 
   WAIT_VBLANK
 
@@ -95,13 +105,13 @@ mainloop:
 ; --------------------------------------------------
 ; update the sprite oam
 ; --------------------------------------------------
-  lda #80
+  lda y_pos_hi
   sta $0200
   lda #$01 ; sprite tiile gfx
   sta $0201
   lda #$01 ; palette
   sta $0202
-  lda xhigh
+  lda x_pos_hi
   sta $0203
 
 ; --------------------------------------------------
@@ -109,25 +119,13 @@ mainloop:
 ; --------------------------------------------------
   lda buttons_held
   and #BTN_RIGHT
-  beq done
-  lda speed
-  cmp #250
-  beq done
-  clc
-  adc #2
-  sta speed
-done:
+  beq button_released
 
-  lda xlow
-  clc
-  adc speed
-  sta xlow
-  bcc dont_inc_xhigh
-  inc xhigh
-dont_inc_xhigh:
+button_released:
 
-
-  ;loop
+; --------------------------------------------------
+; loop
+; --------------------------------------------------
   inc sleeping
 sleep:
   lda sleeping

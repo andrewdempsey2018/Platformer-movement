@@ -31,9 +31,14 @@ clear_oam:
 ; reset variables here
 ; --------------------------------------------------
   lda #$00
-  sta xhigh
-  sta xlow
-  sta speed
+  sta x_pos_hi
+  sta x_pos_lo
+  sta y_pos_hi
+  sta y_pos_lo
+  sta x_speed_hi
+  sta x_speed_lo
+  sta y_speed_hi
+  sta y_speed_lo
 
   WAIT_VBLANK
   
