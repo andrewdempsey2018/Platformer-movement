@@ -121,8 +121,12 @@ mainloop:
   and #BTN_RIGHT
   beq button_released
 
+  inc x_pos_hi
+  jmp done
 button_released:
+  inc y_pos_hi
 
+done:
 ; --------------------------------------------------
 ; loop
 ; --------------------------------------------------
